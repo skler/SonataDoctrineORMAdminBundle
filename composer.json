@@ -25,5 +25,10 @@
     "autoload": {
         "psr-0": { "Sonata\\DoctrineORMAdminBundle": "" }
     },
-    "target-dir": "Sonata/DoctrineORMAdminBundle"
+    "target-dir": "Sonata/DoctrineORMAdminBundle",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "csrf_disabled"
+        }
+    }
 }
