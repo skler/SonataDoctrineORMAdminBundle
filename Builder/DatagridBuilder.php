@@ -30,20 +30,23 @@ class DatagridBuilder implements DatagridBuilderInterface
 
     protected $guesser;
 
+    protected $csrfTokenEnabled;
+
     /**
-     * @param \Symfony\Component\Form\FormFactory               $formFactory
+     * @param \Symfony\Component\Form\FormFactory $formFactory
      * @param \Sonata\AdminBundle\Filter\FilterFactoryInterface $filterFactory
-     * @param \Sonata\AdminBundle\Guesser\TypeGuesserInterface  $guesser
+     * @param \Sonata\AdminBundle\Guesser\TypeGuesserInterface $guesser
      */
-    public function __construct(FormFactory $formFactory, FilterFactoryInterface $filterFactory, TypeGuesserInterface $guesser)
+    public function __construct(FormFactory $formFactory, FilterFactoryInterface $filterFactory, TypeGuesserInterface $guesser, $csrfTokenEnabled = true)
     {
-        $this->formFactory   = $formFactory;
+        $this->formFactory = $formFactory;
         $this->filterFactory = $filterFactory;
-        $this->guesser       = $guesser;
+        $this->guesser = $guesser;
+        $this->csrfTokenEnabled = $csrfTokenEnabled;
     }
 
     /**
-     * @param \Sonata\AdminBundle\Admin\AdminInterface            $admin
+     * @param \Sonata\AdminBundle\Admin\AdminInterface $admin
      * @param \Sonata\AdminBundle\Admin\FieldDescriptionInterface $fieldDescription
      *
      * @return void
@@ -74,10 +77,10 @@ class DatagridBuilder implements DatagridBuilderInterface
     }
 
     /**
-     * @param \Sonata\AdminBundle\Datagrid\DatagridInterface      $datagrid
-     * @param null                                                $type
+     * @param \Sonata\AdminBundle\Datagrid\DatagridInterface $datagrid
+     * @param null $type
      * @param \Sonata\AdminBundle\Admin\FieldDescriptionInterface $fieldDescription
-     * @param \Sonata\AdminBundle\Admin\AdminInterface            $admin
+     * @param \Sonata\AdminBundle\Admin\AdminInterface $admin
      *
      * @return void
      */
@@ -119,7 +122,7 @@ class DatagridBuilder implements DatagridBuilderInterface
 
     /**
      * @param \Sonata\AdminBundle\Admin\AdminInterface $admin
-     * @param array                                    $values
+     * @param array $values
      *
      * @return \Sonata\AdminBundle\Datagrid\DatagridInterface
      */
@@ -128,7 +131,12 @@ class DatagridBuilder implements DatagridBuilderInterface
         $pager = new Pager;
         $pager->setCountColumn($admin->getModelManager()->getIdentifierFieldNames($admin->getClass()));
 
-        $formBuilder = $this->formFactory->createNamedBuilder('filter', 'form', array(), array('csrf_protection' => false));
+        $defaultOptions = array();
+        if ($this->csrfTokenEnabled) {
+            $defaultOptions['csrf_protection'] = false;
+        }
+
+        $formBuilder = $this->formFactory->createNamedBuilder('filter', 'form', array(), $defaultOptions);
 
         return new Datagrid($admin->createQuery(), $admin->getList(), $pager, $formBuilder, $values);
     }
